@@ -12,8 +12,11 @@ import (
 )
 
 var db *sql.DB
+var codec Codec
 
 func init() {
+	codec = newBase64Codec()
+
 	var err error
 	db, err = sql.Open("postgres", "database=shortener sslmode=disable")
 	if err != nil {
@@ -34,19 +37,18 @@ func (b Base64Codec) Encode(s string) string {
 	str := base64.URLEncoding.EncodeToString([]byte(s))
 	return strings.Replace(str, "=", "", -1)
 }
-func (b Base64Codec) Decode(s string) ([]byte, error) {
+
+func (b Base64Codec) Decode(s string) (string, error) {
 	if l := len(s) % 4; l != 0 {
 		s += strings.Repeat("=", 4-l)
 	}
 	str, err := base64.URLEncoding.DecodeString(s)
-	return str, err
+	return string(str), err
 }
 
 func newBase64Codec() Base64Codec {
 	return Base64Codec{base64.URLEncoding}
 }
-
-var codec = newBase64Codec()
 
 func main() {
 	r := mux.NewRouter()
@@ -92,7 +94,7 @@ func getRecord(id string) (url string, err error) {
 	if err != nil {
 		return "", err
 	}
-	err = db.QueryRow("SELECT url from urls WHERE id = $1", string(rId)).Scan(&url)
+	err = db.QueryRow("SELECT url from urls WHERE id = $1", rId).Scan(&url)
 	if err != nil {
 		return "", err
 	}
