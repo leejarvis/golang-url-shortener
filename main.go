@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -76,7 +77,7 @@ func handleCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(201)
-	fmt.Fprintf(w, codec.Encode(string(id)))
+	fmt.Fprintf(w, codec.Encode(strconv.Itoa(id)))
 }
 
 func handleFind(w http.ResponseWriter, r *http.Request) {
