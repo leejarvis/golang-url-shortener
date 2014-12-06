@@ -38,7 +38,6 @@ func (b Base64Codec) Decode(s string) ([]byte, error) {
 	if l := len(s) % 4; l != 0 {
 		s += strings.Repeat("=", 4-l)
 	}
-	fmt.Println(s)
 	str, err := base64.URLEncoding.DecodeString(s)
 	return str, err
 }
@@ -91,7 +90,6 @@ func handleFind(w http.ResponseWriter, r *http.Request) {
 func getRecord(id string) (url string, err error) {
 	rId, err := codec.Decode(id)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 	err = db.QueryRow("SELECT url from urls WHERE id = $1", string(rId)).Scan(&url)
